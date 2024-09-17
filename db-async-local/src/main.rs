@@ -17,7 +17,35 @@ use std::error::Error;
 //
 // this will generate a file called `build.rs` in the project root
 // this will trigger recompilation when a new migration is added
-
+// 
+// 
+// There are four options for fetching data: 
+// fetch_one (returns a single row)[assumes row exists, returns error if it doesn't], 
+// fetch_optional (instead of an error it will return None), 
+// fetch_all (returns all rows as a Vec),
+// and fetch (returns all as a stream lifetime that can be itertated over)[more async than fetch_all]
+//
+//
+// Example ... iterating a fetch_all:
+// let people = rows.iter().map(|row| Person { full_name: row.get("full_name") }).collect();
+// 
+// 
+// Example ... iterating a fetch:
+// let mut people = vec![];
+// while let Some(row) = rows.try_next().await? {
+//     people.push(Person { full_name: row.get("full_name") 
+// });
+//
+//
+// Perform (atomic) operations together (or, not at all) with Transactions
+// start a transaction:
+// let mut txn = conn.begin().await?;
+// ^^^ returns Transaction Type
+// You then use this as the Type for queries:
+// like this ... .fetch_one(&mut txn) ..... .execute(&mut txn)
+// then: txn.commit().await?
+//
+    
 #[derive(Debug, FromRow)]
 struct Person {
     pub full_name: String,
