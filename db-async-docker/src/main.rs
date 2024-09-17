@@ -1,7 +1,23 @@
+// docker compose up -d db                  // <__ means: runs detached db service
+// docker ps -a                             // <__ means: list all containers
+// docker exec -it db psql -U postgres      // <__ means: enter into db container ... exec, interactive on db: run psql cmd with user postgres
+//
+//
+// from new terminal, run (to see errors in compiler): 
+// docker compose build
+//
+//
+// run this application
+// docker compose up rustapp
+// 
+// TEST: From first terminal (which should be in postgres=#)
+// \dt
+// ^^^ should show tables w/ a _sqlx_migrations table
+// select * from public.person;
+// ^^^ see data
+
 #![allow(dead_code)]
-use dotenv::dotenv;
 use sqlx::FromRow;
-use sqlx::Row;
 use std::error::Error;
 
 #[derive(Debug, FromRow)]
@@ -30,8 +46,9 @@ async fn read_person(conn: &sqlx::PgPool) -> Result<Vec<Person>, Box<dyn Error>>
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenv().ok(); // loads the environment variables
-    let db_conn = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
+    //~ln: 11 of docker-compose.yaml
+    // let db_conn = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
+    let db_conn = env!("DATABASE_URL");
 
     let pool = sqlx::postgres::PgPool::connect(&db_conn).await?;
 
