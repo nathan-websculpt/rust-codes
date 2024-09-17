@@ -35,7 +35,6 @@ async fn create_person(person: &Person, pool: &sqlx::PgPool) -> Result<(), Box<d
 }
 
 async fn read_person(conn: &sqlx::PgPool) -> Result<Vec<Person>, Box<dyn Error>> {
-    // let q = "SELECT id, full_name, created_at FROM person";
     let q = "SELECT full_name FROM person";
     let query = sqlx::query_as::<_, Person>(q);
 
@@ -46,8 +45,6 @@ async fn read_person(conn: &sqlx::PgPool) -> Result<Vec<Person>, Box<dyn Error>>
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    //~ln: 11 of docker-compose.yaml
-    // let db_conn = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
     let db_conn = env!("DATABASE_URL");
 
     let pool = sqlx::postgres::PgPool::connect(&db_conn).await?;
