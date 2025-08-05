@@ -1,6 +1,8 @@
 use log::Level;
 use tokio::io::AsyncReadExt;
 
+// cargo build
+
 async fn sleeper() {
     log::info!("Sleeping");
     tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;

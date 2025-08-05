@@ -1,6 +1,7 @@
 use log::Level;
 use tokio::time;
 
+// cargo build
 async fn run() {
     log::info!("Sleeping");
     time::sleep(time::Duration::from_secs(1)).await;
