@@ -1,12 +1,20 @@
+use tokio::io::AsyncReadExt;
+use tokio::io::AsyncWriteExt;
+use tokio::io::AsyncBufReadExt;
+use tokio::net::TcpListener;
+
+// TODO: left off here
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut handles = vec![];
 
     for i in 0..3 {
         let handle = tokio::spawn(async move {
-            let mut listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", 3000 + i)).await?;
+            let mut listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", 3000 + i)).await;
 
             loop {
+                let listener = TcpListener::bind(address).await.expect("Failed to bind");
                 let (mut socket, _) = listener.accept().await?;
 
                 tokio::spawn(async move {
@@ -26,6 +34,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         println!("{}", echo);
                         socket.write_all(echo.as_bytes()).await?;
                     }
+                    Ok(buf) // TODO: finish this
+                    // OK(())
                 });
             }
         });
@@ -33,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         handles.push(handle);
     }
 
-    futures::future::join_all(handles).await?;
+    futures::future::join_all(handles).await; // TODO: let res mut = futures::future::join_all(handles).await;
 
     Ok(())
 }
@@ -60,8 +70,8 @@ async fn write_file(path: &str, contents: &str) -> std::io::Result<()> {
 }
 
 async fn read_lines(path: &str) -> std::io::Result<()> {
-    let mut file = tokio::fs::File::open(path).await?;
-    let mut reader = tokio::io::BufReader::new(file);
+    let file = tokio::fs::File::open(path).await?;
+    let reader = tokio::io::BufReader::new(file);
 
     let mut lines = reader.lines();
 

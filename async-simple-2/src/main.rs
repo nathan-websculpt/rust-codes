@@ -11,7 +11,7 @@ async fn sleeper() {
 
 async fn reader() {
     log::info!("Reading them datas");
-    let mut reading = tokio::fs::File::open("tst-csv.xlsx").await.unwrap();
+    let mut reading = tokio::fs::File::open("csv.ods").await.unwrap();
     let mut contents = vec![];
     reading.read_to_end(&mut contents).await.unwrap();
     log::info!("Read {} bytes", contents.len()); // tell us how many bytes we read

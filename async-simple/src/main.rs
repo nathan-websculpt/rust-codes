@@ -1,7 +1,13 @@
 use log::Level;
 use tokio::time;
 
+// cargo update (only updates dependencies)
+
 // cargo build
+// cargo run (better for dependencies)
+
+// or....
+// rustc src/main.rs && ./main (compile and run)
 async fn run() {
     log::info!("Sleeping");
     time::sleep(time::Duration::from_secs(1)).await;
