@@ -23,54 +23,36 @@ fn main() {
 fn calc(input: &str) -> Result<f64, String> {
     let input = input.replace(" ", "");
 
-    match input.parse::<f64>() {
-        Ok(n) => Ok(n),
-        Err(_) => {
-            let mut parts = input.split('+');
-            if parts.count() > 1 {
-                let a = parts.next().unwrap();
-                let b = parts.next().unwrap();
+    if let Ok(n) = input.parse::<f64>() {
+        return Ok(n);
+    }
 
-                match (a.parse::<f64>(), b.parse::<f64>()) {
-                    (Ok(a), Ok(b)) => Ok(a + b),
-                    _ => Err(format!("Invalid addition: {}", input)),
+    // Helper closure for binary operations
+    let eval = |op: char| -> Option<Result<f64, String>> {
+        let parts: Vec<&str> = input.split(op).collect();
+        if parts.len() == 2 {
+            match (parts[0].parse::<f64>(), parts[1].parse::<f64>()) {
+                (Ok(a), Ok(b)) => {
+                    return Some(Ok(match op {
+                        '+' => a + b,
+                        '-' => a - b,
+                        '*' => a * b,
+                        '/' => a / b,
+                        _ => unreachable!(),
+                    }))
                 }
-            } else {
-                let mut parts = input.split('-');
-                if parts.count() > 1 {
-                    let a = parts.next().unwrap();
-                    let b = parts.next().unwrap();
-
-                    match (a.parse::<f64>(), b.parse::<f64>()) {
-                        (Ok(a), Ok(b)) => Ok(a - b),
-                        _ => Err(format!("Invalid subtraction: {}", input)),
-                    }
-                } else {
-                    let mut parts = input.split('*');
-                    if parts.count() > 1 {
-                        let a = parts.next().unwrap();
-                        let b = parts.next().unwrap();
-
-                        match (a.parse::<f64>(), b.parse::<f64>()) {
-                            (Ok(a), Ok(b)) => Ok(a * b),
-                            _ => Err(format!("Invalid multiplication: {}", input)),
-                        }
-                    } else {
-                        let mut parts = input.split('/');
-                        if parts.count() > 1 {
-                            let a = parts.next().unwrap();
-                            let b = parts.next().unwrap();
-
-                            match (a.parse::<f64>(), b.parse::<f64>()) {
-                                (Ok(a), Ok(b)) => Ok(a / b),
-                                _ => Err(format!("Invalid division: {}", input)),
-                            }
-                        } else {
-                            Err(format!("Invalid expression: {}", input))
-                        }
-                    }
-                }
+                _ => return Some(Err(format!("Invalid {} operation: {}", op, input))),
             }
         }
+        None
+    };
+
+    // Try each operator
+    for op in ['+', '-', '*', '/'] {
+        if let Some(result) = eval(op) {
+            return result;
+        }
     }
+
+    Err(format!("Invalid expression: {}", input))
 }
